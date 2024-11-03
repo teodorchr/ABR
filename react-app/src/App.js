@@ -24,14 +24,14 @@ const App = () => {
 
         const map = new window.google.maps.Map(document.getElementById('map'), {
           center: userLocation,
-          zoom: 12, // Zoom out a bit
+          zoom: 6, // Zoom out even more
           disableDefaultUI: true, // Disable map controls
           restriction: {
             latLngBounds: {
-              north: userLocation.lat + 0.01,
-              south: userLocation.lat - 0.01,
-              east: userLocation.lng + 0.01,
-              west: userLocation.lng - 0.01,
+              north: userLocation.lat + 0.05,
+              south: userLocation.lat - 0.05,
+              east: userLocation.lng + 0.05,
+              west: userLocation.lng - 0.05,
             },
             strictBounds: true,
           },
