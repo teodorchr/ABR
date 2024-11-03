@@ -7,6 +7,7 @@ dotenv.config();
 const App = () => {
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
+  const [circles, setCircles] = useState([]);
 
   useEffect(() => {
     const loader = new Loader({
@@ -23,7 +24,17 @@ const App = () => {
 
         const map = new window.google.maps.Map(document.getElementById('map'), {
           center: userLocation,
-          zoom: 14,
+          zoom: 12, // Zoom out a bit
+          disableDefaultUI: true, // Disable map controls
+          restriction: {
+            latLngBounds: {
+              north: userLocation.lat + 0.01,
+              south: userLocation.lat - 0.01,
+              east: userLocation.lng + 0.01,
+              west: userLocation.lng - 0.01,
+            },
+            strictBounds: true,
+          },
         });
 
         const marker = new window.google.maps.Marker({
@@ -33,9 +44,30 @@ const App = () => {
 
         setMap(map);
         setMarker(marker);
+        animateCircles(userLocation, map);
       });
     });
   }, []);
+
+  const animateCircles = (center, map) => {
+    const numCircles = 20;
+    const interval = 1000; // 1 second for each circle
+    for (let i = 0; i < numCircles; i++) {
+      setTimeout(() => {
+        const circle = new window.google.maps.Circle({
+          strokeColor: "#FF0000",
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: "#FF0000",
+          fillOpacity: 0.05, // Adjust transparency
+          map: map,
+          center: center,
+          radius: (1000 / numCircles) * (numCircles - i), // Starting large and getting smaller
+        });
+        setCircles((prevCircles) => [...prevCircles, circle]);
+      }, i * interval);
+    }
+  };
 
   const handleLocate = () => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -45,6 +77,8 @@ const App = () => {
       };
       map.setCenter(userLocation);
       marker.setPosition(userLocation);
+      circles.forEach((circle) => circle.setMap(null)); // Remove old circles
+      animateCircles(userLocation, map); // Create new circles at new location
     });
   };
 
