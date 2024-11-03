@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const App = () => {
   const [map, setMap] = useState(null);
+  const [marker, setMarker] = useState(null);
 
   useEffect(() => {
     const loader = new Loader({
-      apiKey: 'YOUR_GOOGLE_MAPS_API_KEY',
+      apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
       version: 'weekly',
     });
 
@@ -22,7 +26,13 @@ const App = () => {
           zoom: 14,
         });
 
+        const marker = new window.google.maps.Marker({
+          position: userLocation,
+          map: map,
+        });
+
         setMap(map);
+        setMarker(marker);
       });
     });
   }, []);
@@ -34,6 +44,7 @@ const App = () => {
         lng: position.coords.longitude,
       };
       map.setCenter(userLocation);
+      marker.setPosition(userLocation);
     });
   };
 
